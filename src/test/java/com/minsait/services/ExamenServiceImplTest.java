@@ -94,6 +94,22 @@ class ExamenServiceImplTest {
 
     @Test
     void testSaveSinPreguntas(){
+        String nombre = "Historia";
+        Examen examen = new Examen(null,nombre);
+        when(examenRepository.save(any(Examen.class))).then(
+                invocationOnMock -> {
+                    Examen examen1 = invocationOnMock.getArgument(0);
+                    examen1.setId(4L);
+                    return examen1;
+                }
+        );
+
+        Examen examen1 = service.save(examen);
+        assertEquals(4L,examen.getId());
+        assertEquals(nombre, examen1.getNombre());
+        assertEquals(0, examen1.getPreguntas().size());
+        verify(preguntasRepository, times(0)).savePreguntas(anyList());
+        /*
         when(examenRepository.save(any(Examen.class))).thenReturn(Datos.EXAMEN);
         Examen examen = service.save(Datos.EXAMEN);
         assertAll(
@@ -101,12 +117,28 @@ class ExamenServiceImplTest {
                 ()->assertEquals(4L,examen.getId()),
                 ()->assertEquals("Historia", examen.getNombre())
         );
-        verify(examenRepository).save(any(Examen.class));
+        verify(examenRepository).save(any(Examen.class));*/
     }
 
     @Test
     void testSaveConPreguntas(){
-        Examen examenIni = Datos.EXAMEN;
+        String nombre = "Historia";
+        Examen examen = new Examen(null,nombre);
+        examen.setPreguntas(Datos.PREGUNTAS);
+        when(examenRepository.save(any(Examen.class))).then(
+                invocationOnMock -> {
+                    Examen examen1 = invocationOnMock.getArgument(0);
+                    examen1.setId(4L);
+                    return examen1;
+                }
+        );
+        Examen examen1 = service.save(examen);
+        assertEquals(4L,examen.getId());
+        assertEquals(nombre, examen1.getNombre());
+        assertEquals(3, examen1.getPreguntas().size());
+        verify(preguntasRepository, atLeastOnce()).savePreguntas(anyList());
+
+        /*Examen examenIni = Datos.EXAMEN;
         examenIni.setPreguntas(Datos.PREGUNTAS);
         when(examenRepository.save(any(Examen.class))).thenReturn(Datos.EXAMEN);
         Examen examen = service.save(examenIni);
@@ -117,7 +149,7 @@ class ExamenServiceImplTest {
                 ()->assertFalse(examen.getPreguntas().isEmpty())
         );
         verify(examenRepository).save(any(Examen.class));
-        verify(preguntasRepository).savePreguntas(anyList());
+        verify(preguntasRepository).savePreguntas(anyList());*/
     }
 
 
